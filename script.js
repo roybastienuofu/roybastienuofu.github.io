@@ -994,7 +994,7 @@ function industryComparison(){
                 {label: industry2Name, values: [industry2Jobs, industry2Salary]
             }]
     };
-    console.log("compData.series.length: " + compData.series.length);
+    //console.log("compData.series.length: " + compData.series.length);
 
     var chartWidth       = 500,
         barHeight        = 20,
