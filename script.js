@@ -898,6 +898,7 @@ function drawStates(usStateData) {
 }
 
 function initializeBubbleChart(){
+    // code adopted from: http://bl.ocks.org/mbostock/4063269
     //console.log("initializeBubbleChart");
     var diameter = 900,
         format = d3.format(",d"),
