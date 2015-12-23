@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!--<style>-->
+<!--body {-->
+<!--font: 10px sans-serif;-->
+<!--}-->
+<!--</style>-->
+<head lang="en">
+    <!--<script src="d3.js"></script>-->
+
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="http://code.jquery.com/jquery-2.1.4.js" charset="utf-8"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+
+    <!--Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="libs/bootstrap/css/bootstrap.min.css">
+
+    <!-- Get some nice font-->
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="container">
+        <h1>Visualising spatial relationships in the genome </h1>
+
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <p> The following visualization displays the regions of DNA interaction within a folded chromosome.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <!--<h1>Visualising spatial relationships in the genome </h1>-->
+</div>
+
+
+<div class="container">
+
+    <select id="dropDown" onchange="dropDownChanged()">
+        <option value="1">Chromosome 1</option>
+        <option value="2">Chromosome 2</option>
+        <option value="3">Chromosome 3</option>
+        <option value="4">Chromosome 4</option>
+        <option value="5">Chromosome 5</option>
+        <option value="6">Chromosome 6</option>
+        <option value="7">Chromosome 7</option>
+        <option value="8">Chromosome 8</option>
+        <option value="9">Chromosome 9</option>
+        <option value="10">Chromosome 10</option>
+        <option value="11">Chromosome 11</option>
+        <option value="12">Chromosome 12</option>
+        <option value="13">Chromosome 13</option>
+        <option value="14">Chromosome 14</option>
+        <option value="15">Chromosome 15</option>
+        <option value="16">Chromosome 16</option>
+        <option value="17">Chromosome 17</option>
+        <option value="18">Chromosome 18</option>
+        <option value="19">Chromosome 19</option>
+        <option value="20">Chromosome 20</option>
+        <option value="21">Chromosome 21</option>
+        <option value="22" selected>Chromosome 22</option>
+        <option value="X">Chromosome X</option>
+    </select>
+
+    <script type="text/javascript">
+        function dropDownChanged(){
+            var selectBox = document.getElementById('dropDown');
+            var chr = selectBox.options[selectBox.selectedIndex].value;
+            document.getElementById("slider").value = 0;
+            document.getElementById("range").innerHTML = "Showing the strongest 100% of connections.";
+            clearArrays();
+            startHere(chr);
+        }
+    </script>
+
+
+
+    <input type="range" id="slider" min="0" max="0.5" value="0" step="0.0025" onchange="showValue(this.value)" />
+    <span id="range">Showing the strongest 100% of connections.</span>
+    <script type="text/javascript">
+        function showValue(newValue)
+        {
+            document.getElementById("range").innerHTML = "Showing the strongest " + (1-newValue)*100 + "% of connections.";
+            sliderCalled(newValue);
+        }
+    </script>
+
+    <div>
+        <svg width="960" height="500" id="barChart">
+            <g id="xAxis"></g>
+            <g id="yAxis"></g>
+            <g id="bars"></g>
+        </svg>
+    </div>
+</div>
+
+
+
+
+<script src="readData.js"></script>
+<script src="chord2.js"></script>
+
+
+</body>
+
