@@ -19,29 +19,28 @@ d3.chord2 = function() {
         colorschemeArcs = ["#d9d9d9"],
         colorScale;
 
-    //alert("chord2called");
 
     function chord2(selection){
 
-        //console.log("In chord2");
+        var colorScale = d3.scale.linear()
+            .domain([0, 1])
+            //.range(['#edf8e9', '#006d2c'])
+            .range(['#edf8e9', '#4db24d'])
+            .interpolate(d3.interpolateLab);
 
         selection.each(function (d, i) {
-
-
-
 
             var selection = d3.select(this);
 
             connections = d.connections;
 
-            //console.log("In selection.each()");
 
             selection.append("g")
                 .attr("class", "arc")
                 .selectAll("path")
                 .data(chord2.groups)
               .enter().append("path")
-                .style("fill", 
+                .style("fill",
                        function(d) {
                            return fillArcs(colorschemeArcs)(d.index %
                                                             colorschemeArcs.length);
@@ -51,8 +50,6 @@ d3.chord2 = function() {
                 .on("mouseover", fade(selection, .1))
                 .on("mouseout", fade(selection, 1));
 
-            selection.data(chord2.groups).exit().remove(); // RB
-
             selection.append("g")
                 .attr("class", "chord")
                 .selectAll("path")
@@ -60,17 +57,24 @@ d3.chord2 = function() {
               .enter().append("path")
                 .attr("d", d3.svg.chord().radius(innerRadius))
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-                .style("fill", 
-                       function(d) {
-                           return fillChords(d.polygon %
-                                             fillChords.range().length);
-                       })
+                // Fill for chords
+                //.style("fill",
+                //       function(d) {
+                //           //console.log(d);
+                //           return fillChords(d.polygon %
+                //                             fillChords.range().length);
+                //       })
+                .style("fill",
+                    function(d) {
+                        //console.log(d);
+                        return colorScale(d.source.value);
+                })
                 .style("opacity", 1)
                 .style("fill-opacity", .67)
                 .style("stroke", "#000")
                 .style("stroke-width", ".5px");
 
-            selection.data(chord2.chords).exit().remove(); // RB
+            //selection.data(chord2.chords).exit().remove(); // RB
 
             var labels = d.labels || (d3.range(chord2.groups().length)
                                       .map(function(n) {return "group" + n;}));

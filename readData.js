@@ -6,6 +6,7 @@ var allData = {connections: [], labels: {}};
 var data = {connections: [], labels: {}};
 var groupsData = [];
 var connectionsData= [];
+var countData = [];
 var maxCount;
 var rawData;
 
@@ -13,70 +14,51 @@ var rawData;
 //(function () {
 
     function drawHisto(){
-        //console.log(connectionsData);
-        var colorScale;
+        countData.sort(function(a, b){return a-b});
 
-        var svgBounds = document.getElementById("barChart").getBoundingClientRect(),
-            xAxisWidth = 100,
-            yAxisHeight = 60;
+        //Width and height
+        var w = 1000;
+        var h = 300;
+        var barPadding = 0;
 
-        var xScale = d3.scale.ordinal()
-            .domain(rawData.map(function (d) {
-                return d.group1;
-            }))
-            //.domain([0, rawData.length])
-            .rangeRoundBands([yAxisHeight, svgBounds.width], 0.1);
-
-        var maxAttendance = d3.max(rawData, function (d) {
-                return parseInt(d.count);
-        });
-
+        var dataset = countData;
+        console.log("countData.length "+countData.length);
 
         var yScale = d3.scale.linear()
-            .domain([0, maxAttendance]).range([svgBounds.height - xAxisWidth, 0]);
+            .domain([0, countData[countData.length-1]])
+            .range([0,h]);
 
-        colorScale = d3.scale.linear()
-            .domain([0, maxAttendance])
-            .range(['#edf8e9', '#006d2c'])
-            .interpolate(d3.interpolateLab);
+        //console.log(maxCount);
 
-        // Create the axes
-        var xAxis = d3.svg.axis()
-            .scale(xScale)
-            .orient("left");
-        d3.select("#xAxis")
-            .attr("transform", "rotate(-90) translate(" + (xAxisWidth - svgBounds.height) + ",0)")
-            .call(xAxis);
+        var xScale = d3.scale.linear()
+            .domain([0,maxCount])
+            .range([0,w]);
 
-        var yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient("left");
-        d3.select("#yAxis")
-            .attr("transform", "translate(" + yAxisHeight + ",0)")
-            .call(yAxis);
+        //Create SVG element
+        d3.select('#barChart').selectAll('svg').remove();
+        var svg = d3.select("#barChart")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
 
-        // Create the bars
-        var bars = d3.select("#bars").selectAll("rect").data(rawData);
-        bars.enter().append('rect');
-        bars.exit().remove();
-        bars.attr('x', function (d) {
-            return xScale(d.group1);
-        })
-            .attr('width', function (d) {
-                return xScale.rangeBand();
+        //console.log("dataset.length " + dataset.length);
+
+        svg.selectAll("rect")
+            .data(dataset)
+            .enter().append("rect")
+
+            .attr("x", function(d, i) {
+                return i * (w / dataset.length);
             })
-            .attr('y', function (d) {
-                return yScale(d.count);
+            .attr("y", function(d) {
+                //return h - (d);
+                return h - yScale(d);
             })
-            .attr('height', function (d) {
-                return svgBounds.height - xAxisWidth - yScale(d.count);
-            })
-            .attr('fill', function (d) {
-                return colorScale(d.count);
-            })
-        ;
+            .attr("width", w / dataset.length - barPadding)
+            .attr("height", function(d) {
+                return d * 4;
+            });
 
-        var currentBrushRegion = null;
         var brush = d3.svg.brush()
             .x(xScale)
             .on("brush", function () {
@@ -88,55 +70,40 @@ var rawData;
                 } else {
                     selectedRange = brush.extent();
                 }
-                console.log(selectedRange[0], selectedRange[1]);
+                //console.log(Math.round(selectedRange[0]), Math.round(selectedRange[1]));
+                brushCalled(Math.round(selectedRange[0]), Math.round(selectedRange[1]))
             });
-        //console.log(bars);
+
+        var gBrush = svg.append('g')
+            .attr('class', 'x brush')
+            .call(brush);
+        gBrush.selectAll("rect")
+            .attr("height", h)
+            .attr("width", w);
+
 
     }
 
+function chromoSelected(chr){
+    clearArrays();
+    startHere(chr);
+}
 
-    // Retired function was used in initial development phase.
-    function dataLoaded(error, groupData, connectionData){
-
-        groupsData = groupData;
-        connectionsData = connectionData;
-
-        for (var i = 0; i < groupData.length; i++){
-            var toPush = [{group: +groupData[i].group, value: +groupData[i].value}];
-            allData.connections.push(toPush);
-        }
-
-        for (i = 0; i < connectionData.length; i++){
-            if (+connectionData[i].group != +connectionData[i].group1){
-                toPush = [{group: +connectionData[i].group, value: +connectionData[i].value},
-                    {group: +connectionData[i].group1, value: +connectionData[i].value1}];
-                allData.connections.push(toPush);
-            }
-        }
-
-        for (i = 0; i < groupData.length; i++){
-            //allData.labels[i] = "chr22 " + i + "Mb"
-            allData.labels[i] =  i + "Mb"
-        }
-
-
-        data = allData;
-
-        //drawHisto();
-        loadScreen();
-    }
 
 function clearArrays(){
     allData = {connections: [], labels: {}};
     data = {connections: [], labels: {}};
     groupsData = [];
     connectionsData= [];
-    //scrollMaxX = 0;
+    countData = [];
 }
 
 
-function sliderCalled(value){
+function brushCalled(minVal, maxVal){
+    console.log(minVal, maxVal);
     data = {connections: [], labels: {}};
+    minVal = minVal/maxCount;
+    maxVal = maxVal/maxCount;
 
     data.labels = allData.labels;
 
@@ -146,15 +113,17 @@ function sliderCalled(value){
 
     for (i = groupsData.length; i < allData.connections.length; i++){
 
-        if (allData.connections[i][0].value > value){
+        if ((allData.connections[i][0].value > minVal) && (allData.connections[i][0].value < maxVal)){
             data.connections.push(allData.connections[i]);
         }
     }
-
+    //console.log(minVal, maxVal);
+    //console.log(data.connections);
     loadScreen();
 }
 
     function rawDataLoaded(error, rawDataIn){
+
         rawData = rawDataIn;
 
         maxCount = d3.max(rawData.map(function (d){
@@ -181,6 +150,9 @@ function sliderCalled(value){
 
         for (i = 0; i < rawData.length; i++){
             if(rawData[i].group1 != rawData[i].group2){
+                // Push to countData for bar chart
+                countData.push(rawData[i].count);
+
                 toPush = [{group: +rawData[i].group1/1000000, value: (rawData[i].count/maxCount)},
                     {group: +rawData[i].group2/1000000, value: (rawData[i].count/maxCount)}];
                 allData.connections.push(toPush);
@@ -190,23 +162,30 @@ function sliderCalled(value){
             }
         }
 
+        //console.log("countdata.length"+countData.length);
+
         data = allData;
 
-        //drawHisto();
+        drawHisto();
         loadScreen();
+
     }
 
 function loadScreen(){
 
+    //console.log(data.connections.length);
+
     data = [data];
+
+
 
     var width = 960, height = 900, padding = 0.005; //padding = .05
 
     //Clear all of the old SVG elements
-    //seqArcContextSVG.selectAll("defs").remove();
-    //seqArcContextSVG.selectAll("ellipse").remove();
-
-    d3.select("body").selectAll("svg").remove();
+    d3.select("body").selectAll("#chordSvg").remove();
+    d3.select("body").selectAll("#chord").remove();
+    //d3.select("body").selectAll("svg").remove();
+    //d3.select("chordDiv").selectAll("#chordSvg").remove();
 
     chart = d3.chord2()
         .width(width)
@@ -214,15 +193,37 @@ function loadScreen(){
         .padding(padding);
 
 
+    //d3.select("body")
+    //    //.selectAll("svg")
+    //    .selectAll("#chord")
+    //    .data(data)
+    //    .enter()
+    //    .append("svg")
+    //    .attr("width", width)
+    //    .attr("height", height)
+    //    .call(chart);
 
     d3.select("body")
-        .selectAll("svg")
+        //.selectAll("svg")
+        .selectAll("#chord")
         .data(data)
         .enter()
         .append("svg")
+        .attr("id", "chord")
+        .style("align", "center")
         .attr("width", width)
         .attr("height", height)
         .call(chart);
+
+
+}
+
+function setupDivs(){
+    document.getElementById("buttonDiv1").style.margin = "50px 50px 20px 50px";
+    document.getElementById("buttonDiv2").style.margin = "20px 50px 20px 50px";
+    document.getElementById("buttonDiv3").style.margin = "20px 50px 20px 50px";
+    document.getElementById("barChart").style.margin = "20px 50px 20px 50px";
+    document.getElementById("chordSvg").style.margin = "20px 50px 50px 20px";
 }
 
 
@@ -233,6 +234,6 @@ function startHere(chr){
         .defer(d3.tsv, 'data/1mb_resolution_intrachromosomal/chr'+chr+'/MAPQGE30/chr'+chr+'_1mb_header.RAWobserved')
         .await(rawDataLoaded);
 }
-
+setupDivs();
 startHere(22);
 //})();
