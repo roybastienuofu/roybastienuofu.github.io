@@ -25,7 +25,7 @@ d3.chord2 = function() {
         var colorScale = d3.scale.linear()
             .domain([0, 1])
             //.range(['#edf8e9', '#006d2c'])
-            .range(['#edf8e9', '#4db24d'])
+            .range(['#edf8e9', '#00b300'])
             .interpolate(d3.interpolateLab);
 
         selection.each(function (d, i) {

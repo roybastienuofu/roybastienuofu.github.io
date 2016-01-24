@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4f7ba36b-abd0-4a02-853d-b6a30c026d5e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/chord2.js" afterPath="$PROJECT_DIR$/chord2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/readData.js" afterPath="$PROJECT_DIR$/readData.js" />
     </list>
     <ignored path="roybastienuofu.github.io.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -68,8 +66,8 @@
       <file leaf-file-name="chord2.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/chord2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.41322315">
-              <caret line="30" column="40" selection-start-line="30" selection-start-column="40" selection-end-line="30" selection-end-column="40" />
+            <state vertical-scroll-proportion="0.39256197">
+              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -465,8 +463,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/chord2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41322315">
-          <caret line="30" column="40" selection-start-line="30" selection-start-column="40" selection-end-line="30" selection-end-column="40" />
+        <state vertical-scroll-proportion="0.39256197">
+          <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
           <folding />
         </state>
       </provider>
