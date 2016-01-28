@@ -182,10 +182,11 @@ function loadScreen(){
     var width = 960, height = 900, padding = 0.005; //padding = .05
 
     //Clear all of the old SVG elements
-    d3.select("body").selectAll("#chordSvg").remove();
-    d3.select("body").selectAll("#chord").remove();
-    //d3.select("body").selectAll("svg").remove();
-    //d3.select("chordDiv").selectAll("#chordSvg").remove();
+    //d3.select("body").selectAll("#chordSvg").remove();
+    //d3.select("body").selectAll("#chord").remove();
+
+    d3.select("#chordDiv").selectAll("#chordSvg").remove();
+    d3.select("#chordDiv").selectAll("#chord").remove();
 
     chart = d3.chord2()
         .width(width)
@@ -193,18 +194,7 @@ function loadScreen(){
         .padding(padding);
 
 
-    //d3.select("body")
-    //    //.selectAll("svg")
-    //    .selectAll("#chord")
-    //    .data(data)
-    //    .enter()
-    //    .append("svg")
-    //    .attr("width", width)
-    //    .attr("height", height)
-    //    .call(chart);
-
-    d3.select("body")
-        //.selectAll("svg")
+    d3.select("#chordDiv")
         .selectAll("#chord")
         .data(data)
         .enter()

@@ -16,8 +16,7 @@ d3.chord2 = function() {
         innerRadius = Math.min(width, height) * .30,
         outerRadius = innerRadius * 1.1,
         fontsize = 15,
-        colorschemeArcs = ["#d9d9d9"],
-        colorScale;
+        colorschemeArcs = ["#d9d9d9"];
 
 
     function chord2(selection){
