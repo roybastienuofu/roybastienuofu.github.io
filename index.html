@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    .brush .extent {
+        stroke: #000;
+        fill-opacity: .125;
+        /*shape-rendering: crispEdges;*/
+    }
+</style>
+<head lang="en">
+    <!--<script src="d3.js"></script>-->
+
+    <script src="https://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <!--<script src="https://code.jquery.com/jquery-2.1.4.js" charset="utf-8"></script>-->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
+    <script src="https://d3js.org/queue.v1.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <!--Stylesheets-->
+    <!--<link rel="stylesheet" type="text/css" href="libs/bootstrap/css/bootstrap.min.css">-->
+
+    <!-- Get some nice font-->
+    <!--<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>-->
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+
+<body>
+
+<div>
+    <h1>Visualising spatial relationships in the genome </h1>
+    <h2>The following visualization displays the regions of DNA interaction within a folded chromosome.</h2>
+</div>
+
+<div id="buttonDiv1" align="center">
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(1)">Chromosome 1</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(2)">Chromosome 2</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(3)">Chromosome 3</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(4)">Chromosome 4</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(5)">Chromosome 5</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(6)">Chromosome 6</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(7)">Chromosome 7</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(8)">Chromosome 8</button>
+</div>
+
+<div id="buttonDiv2" align="center">
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(9)">Chromosome 9</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(10)">Chromosome 10</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(11)">Chromosome 11</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(12)">Chromosome 12</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(13)">Chromosome 13</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(14)">Chromosome 14</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(15)">Chromosome 15</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(16)">Chromosome 16</button>
+</div>
+
+
+<div id="buttonDiv3" align="center">
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(17)">Chromosome 17</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(18)">Chromosome 18</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(19)">Chromosome 19</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(20)">Chromosome 20</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(21)">Chromosome 21</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected(22)">Chromosome 22</button>
+    <button type="button" class="btn btn-success btn-sm" onclick="chromoSelected('X')">Chromosome X</button>
+</div>
+
+<div id="chordDiv" align="center">
+    <svg width="960" height="900" id="chordSvg"></svg>
+</div>
+
+<div id="barChartDiv" align="center">
+    <svg width="1000" height="300" id="barChart"></svg>
+</div>
+
+
+
+<script src="readData.js"></script>
+<script src="chord2.js"></script>
+
+
+</body>
+
