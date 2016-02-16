@@ -1,5 +1,4 @@
-Final Project Repository for Roy Bastien and Priyanka Parekh
-
+Final Project Repository for Roy Bastien
 Project website can be found here:
 https://roybastienuofu.github.io/
 
