@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heatmap</title>
+
+    <script src="https://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="https://d3js.org/queue.v1.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <!--<link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
+</head>
+<style>
+
+    .d3-tip {
+        line-height: 1;
+        font-weight: bold;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 10px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+
+    /* Style northward tooltips differently */
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+
+    div.tooltip {
+        position: absolute;
+        /*display: table-cell;*/
+        /*vertical-align: middle;*/
+        text-align: center;
+        width: 60px;
+        height: 28px;
+        padding: 12px;
+        font: 12px sans-serif;
+        background: rgba(0, 0, 0, 1);
+        color: #fff;
+        border: 0px;
+        /*border-radius: 8px;*/
+        pointer-events: none;
+    }
+</style>
+
+
+
+<body>
+
+<h1>Simple Heatmap generator from HI-C data.</h1>
+
+<div class="input-group input-custom" style="padding-left: 50px; padding-top: 50px; width: 300px">
+    <input type="search" class="form-control" onkeypress="handle(event)" id="search1" style="width: 500px; fill: black; align: center;" placeholder="Select a chromosome..." aria-describedby="basic-addon1">
+            <span class="input-group-btn">
+                <button class="btn btn-secondary" type="button" onclick="heatMap()">Search One Chromosome</button>
+            </span>
+</div>
+
+<div class="input-group input-custom" style="padding-left: 50px; padding-top: 50px; width: 300px">
+    <input type="search" class="form-control" onkeypress="handle2(event)" id="search2" style="width: 500px;fill: black; align: center;" placeholder="Select two chromosomes..." aria-describedby="basic-addon1">
+            <span class="input-group-btn">
+                <button class="btn btn-secondary" type="button" onclick="heatMap2()">Search two chromosomes</button>
+            </span>
+</div>
+
+
+<div id='heatmap'></div>
+
+
+<script>
+    function handle(e){
+        if (e.keyCode === 13){
+            heatMap();
+        }
+    }
+
+    function handle2(e){
+        if (e.keyCode === 13){
+            heatMap2();
+        }
+    }
+
+    function heatMap() {
+        var chr = parseInt(document.getElementById('search1').value);
+        var data = [];
+        var maxCount;
+
+        d3.tsv("../data/1mb_resolution_intrachromosomal/chr" + chr + "/MAPQGE30/chr" + chr + "_1mb_header.RAWobserved", function (dataIn) {
+            data = dataIn;
+            normalizeData();
+        });
+
+        function normalizeData() {
+            console.log(data[0]);
+            data.forEach(function (d) {
+                d.row = +d.group1;
+                d.col = +d.group2;
+                d.score = d.count;
+                if (d.row == d.col) {
+                    d.score = 0;
+                }
+                else {
+                    d.score = +d.score;
+                }
+                d.row = +d.row / 1000000;
+                d.col = +d.col / 1000000;
+
+
+            });
+            maxCount = d3.max(data.map(function (d) {
+                return +d.score;
+            }));
+            drawHeatmap();
+        }
+
+        var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d) {
+                    return "<strong>Interacting Regions:\n</strong> <span style='color:#b3ffb3'>" + d.col +"Mb and "+ d.row+ "Mb" + "</span>";
+                })
+                ;
+
+
+        function drawHeatmap() {
+            var gridSize = 5,
+                    h = gridSize,
+                    w = gridSize,
+                    rectPadding = 60;
+            var margin = {top: 20, right: 80, bottom: 30, left: 50},
+                    width = 6400 - margin.left - margin.right,
+                    height = 3800 - margin.top - margin.bottom;
+            var colorScale = d3.scale.linear()
+                    .domain([0, maxCount])
+    //                                .range(['#4A23D9', '#D92323'])
+    //                .range(['#FA0000', '#F2FA00'])
+//                    .range(['#000000', '#F2FA00'])
+                    .range(['#FFFFFF', '#FA0000'])
+                    //                .range(['#edf8e9', '#00b300'])
+                    .interpolate(d3.interpolateLab)
+                    ;
+
+
+            d3.select("#heatmap").selectAll("svg").remove();
+            var svg = d3.select("#heatmap").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.call(tip);
+
+            var heatMap = svg.selectAll(".heatmap")
+                    .data(data, function (d) {
+                        return d.col + ':' + d.row;
+                    })
+                    .enter().append("svg:rect")
+                    .attr("x", function (d) {
+                        return d.row * w;
+                    })
+                    .attr("y", function (d) {
+                        return d.col * h;
+                    })
+                    .attr("width", function (d) {
+                        return w;
+                    })
+                    .attr("height", function (d) {
+                        return h;
+                    })
+                    .style("fill", function (d) {
+                        return colorScale(d.score);
+                    })
+                    .on("mouseover", tip.show)
+                    .on("mouseout", tip.hide)
+                    ;
+
+        }
+    }
+
+
+    function heatMap2() {
+        var chrs = document.getElementById('search2').value.split(" ");
+        var chr1 = chrs[0];
+        var chr2 = chrs[1];
+
+        filepath = '../data/1mb_resolution_interchromosomal/chr'+chr1+'_chr'+chr2+'/MAPQGE30/chr'+chr1+'_'+chr2+'_1mb.RAWobserved';
+
+
+        // Load each data file, and then call rawDataLoaded() when they are finished.
+        queue()
+                .defer(d3.text, filepath)
+                .await(rawDataLoaded2);
+
+        var data = [];
+        var maxCount;
+
+        function rawDataLoaded2(error, rawDataIn){
+            var headers = ["group1", "group2", "count"].join("\t");
+            rawDataIn = d3.tsv.parse(headers + "\n" + rawDataIn);
+            data = rawDataIn;
+            normalizeData();
+        }
+
+        function normalizeData() {
+            console.log(data[0]);
+            data.forEach(function (d) {
+                d.row = +d.group1;
+                d.col = +d.group2;
+                d.score = d.count;
+                if (d.row == d.col) {
+                    d.score = 0;
+                }
+                else {
+                    d.score = +d.score;
+                }
+                d.row = +d.row / 1000000;
+                d.col = +d.col / 1000000;
+
+
+            });
+            maxCount = d3.max(data.map(function (d) {
+                return +d.score;
+            }));
+            drawHeatmap();
+        }
+
+        var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d) {
+                    return "<strong>Interacting Regions:\n</strong> <span style='color:#b3ffb3'>" + d.col +"Mb and "+ d.row+ "Mb" + "</span>";
+                })
+                ;
+
+
+        function drawHeatmap() {
+            var gridSize = 5,
+                    h = gridSize,
+                    w = gridSize,
+                    rectPadding = 60;
+            var margin = {top: 20, right: 80, bottom: 30, left: 50},
+                    width = 6400 - margin.left - margin.right,
+                    height = 3800 - margin.top - margin.bottom;
+            var colorScale = d3.scale.linear()
+                    .domain([0, maxCount])
+                    //                                .range(['#4A23D9', '#D92323'])
+                    //                .range(['#FA0000', '#F2FA00'])
+//                    .range(['#000000', '#F2FA00'])
+                                    .range(['#FFFFFF', '#FA0000'])
+                    //                .range(['#edf8e9', '#00b300'])
+                    .interpolate(d3.interpolateLab)
+                    ;
+
+
+            d3.select("#heatmap").selectAll("svg").remove();
+            var svg = d3.select("#heatmap").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.call(tip);
+
+            var heatMap = svg.selectAll(".heatmap")
+                    .data(data, function (d) {
+                        return d.col + ':' + d.row;
+                    })
+                    .enter().append("svg:rect")
+                    .attr("x", function (d) {
+                        return d.row * w;
+                    })
+                    .attr("y", function (d) {
+                        return d.col * h;
+                    })
+                    .attr("width", function (d) {
+                        return w;
+                    })
+                    .attr("height", function (d) {
+                        return h;
+                    })
+                    .style("fill", function (d) {
+                        return colorScale(d.score);
+                    })
+                    .on("mouseover", tip.show)
+                    .on("mouseout", tip.hide)
+                    ;
+
+        }
+    }
+</script>
+
+
+
+
+<!-- jQuery -->
+<script src="../libs/bootstrap/js/jquery.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="../libs/bootstrap/js/bootstrap.min.js"></script>
+
+</body>
+</html>

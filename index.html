@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Visualizing Spacial Relationships in the Genome</title>
+<style>
+    .brush .extent {
+        stroke: #000;
+        fill-opacity: .125;
+        /*shape-rendering: crispEdges;*/
+    }
+</style>
+<head lang="en">
+    <script src="https://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="https://d3js.org/queue.v1.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <!--<link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+
+<body>
+
+<div id="headerDiv" align="center">
+    <h1 id="header">Visualising spatial relationships in the genome </h1>
+    <h2 id="subheader">This tool displays spacial proximity frequency of DNA regions within folded chromosomes.</h2>
+</div>
+
+<div id="chrSearchDiv1" align="center">
+    <div class="box" align="=center">
+        <!--<div class="container-1" align="center">-->
+            <!--<row>-->
+            <!--<input align="center" type="search" onkeypress="handle(event)" id="oldsearch1" style="fill: black; align: center;" placeholder="Select a gene or chromosome..." />-->
+            <!--<button type="button" id="oldaddButton" style="margin-left: 100px;" onclick="startHere2(21)">Add Chromosome</button>-->
+            <!--</row>-->
+        <!--</div>-->
+
+        <div class="input-group">
+            <input type="search" class="form-control" onkeypress="handle(event)" id="search1" style="fill: black; align: center;" placeholder="Select a gene or chromosome..." aria-describedby="basic-addon1">
+            <span class="input-group-btn">
+                <button class="btn btn-secondary" type="button" onclick="handleButton()">Search</button>
+            </span>
+            <span class="input-group-btn" style="padding-left:  20px">
+                <button class="btn btn-secondary" type="button" id="addButton" onclick="startHere2(21)"><span id="glyph" class="glyphicon glyphicon-plus"></span> Add Chromosome</button>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div id="chrDisplayDiv1" align="center">
+    <svg width="560" height="60" id="chrBrush1" align="center">
+        <rect align="center" id="brushRect" x="5" y="10" rx="20" ry="20" width="550" height="20" style="fill:#b3ffb3;stroke:black;stroke-width:1;opacity:0.7;" />
+        <text x="175" y="25" font-family="Helvetica" font-size="14" fill="black" > Brush a chromosome's regions here </text>
+    </svg>
+</div>
+
+<div id="geneNameDiv1" align="center" style="height: 25px"> </div>
+
+<div id="geneDisplayDiv1" align="center" style="height: 125px; border-radius: 25px; border: 1px solid #d6e0f5; padding: 2px;">
+
+</div>
+
+<div id="chr2holder" style="display: none">
+    <div id="dummyDiv" style="display: none"></div>
+<div id="chrSearchDiv2" align="center" style="margin-top: 20px; display: block;">
+
+    <!--<input type="search" onkeypress="handle2(event)" id="oldsearch2" style="fill: black" placeholder="Select a gene or chromosome..." />-->
+
+    <div class="input-group">
+        <input type="search" class="form-control" onkeypress="handle2(event)" id="search2" style="fill: black; align: center;" placeholder="Select a gene or chromosome..." aria-describedby="basic-addon1">
+            <span class="input-group-btn">
+                <button class="btn btn-secondary" type="button" onclick="handleButton2()">Search</button>
+            </span>
+    </div>
+    <!--<svg height="50"></svg>-->
+</div>
+
+<div id="chrDisplayDiv2" align="center" style="display: block;">
+    <svg width="560" height="60" id="chrBrush2">
+        <rect id="brushRect2" x="5" y="10" rx="20" ry="20" width="550" height="20" style="fill:#b3ffb3;stroke:black;stroke-width:1;opacity:0.7" />
+        <text x="175" y="25" font-family="Helvetica" font-size="14" fill="black" > Brush a chromosome's regions here </text>
+    </svg>
+</div>
+
+<div id="geneNameDiv2" align="center" style="height: 25px; display: block;"> </div>
+
+<div id="geneDisplayDiv2" align="center" style="height: 125px; border-radius: 25px; border: 1px solid #d6e0f5; padding: 2px; display: block;">
+
+</div>
+</div>
+
+<div class="container" id="readmeV5" align="center">
+    <div class="row" style=" border-radius: 25px; border: 1px solid #d6e0f5; padding: 2px;">
+
+        <h4 align="center">Closest spatial regions in current selection</h4>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" id="connectedLeft" align="center">
+            <u><h5 id="connectedLeftHeader">Chromosome 22 25Mb</h5></u>
+            <!--<p id="connectedLeftGenes">PIWIL3, SGSM1, TMEM211, KIAA1671, CRYBB3, CRYBB2, LRP5L, ADRBK2</p>-->
+            <p id="connectedLeftGenes">
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=PIWIL3;site=ensembl;facet_species=Human">PIWIL3</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=SGSM1;site=ensembl;facet_species=Human">SGSM1</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=TMEM211;site=ensembl;facet_species=Human">TMEM211</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=KIAA1671;site=ensembl;facet_species=Human">KIAA1671</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=CRYBB3;site=ensembl;facet_species=Human">CRYBB3</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=LRP5L;site=ensembl;facet_species=Human">LRP5L</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=ADRBK2;site=ensembl;facet_species=Human">ADRBK2</a>
+            </p>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" id="connectedRight" align="center">
+            <u><h5 id="connectedRightHeader">Chromosome 22 26Mb</h5></u>
+            <p id="connectedRightGenes">
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=MYO18B;site=ensembl;facet_species=Human">MYO18B</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=SEZ6L;site=ensembl;facet_species=Human">SEZ6L</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=ASPHD2;site=ensembl;facet_species=Human">ASPHD2</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=HPS4;site=ensembl;facet_species=Human">HPS4</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=SRRD;site=ensembl;facet_species=Human">SRRD</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=TFIP11;site=ensembl;facet_species=Human">TFIP11</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=TPST2;site=ensembl;facet_species=Human">TPST2</a>,
+                <a href="http://uswest.ensembl.org/Homo_sapiens/Search/Results?q=CRYBB1;site=ensembl;facet_species=Human">CRYBB1</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div></div>
+<div id="barChartDiv" align="center" style="border-radius: 25px; border: 1px solid #d6e0f5; padding: 2px;">
+    <!--<svg width="1000" height="270" id="barChart"></svg>-->
+</div>
+
+
+<div id="chordDiv" align="center" style="border-radius: 25px; border: 1px solid #d6e0f5; padding: 2px; vertical-align: text-top">
+    <svg width="960" height="900" id="chordSvg"></svg>
+</div>
+
+
+
+<div id="paddingDiv" style="padding: 10px;">
+    <!--<svg height="50" id="paddingSvg"></svg>-->
+    <a href="./heatmap/index.html" class="btn btn-default" role="button">heatmap</a>
+</div>
+
+
+
+<script src="chrBrushes.js"></script>
+<script src="readData.js"></script>
+<script src="chord2.js"></script>
+
+<!-- jQuery -->
+<script src="./libs/bootstrap/js/jquery.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+
+</body>
+
+
+
+
+
